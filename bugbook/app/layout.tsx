@@ -6,8 +6,12 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "bugbook",
-  description: "A social media platform built by developers for developers.",
+  title: {
+    absolute: "BugBook",
+    default: "BugBook",
+    template: "%s | BugBook",
+  },
+  description: "A social media platform built by developers for developers",
 };
 
 export default function RootLayout({
