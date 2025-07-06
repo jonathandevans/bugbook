@@ -7,7 +7,7 @@ import { submitPostAction } from "./actions";
 import { UserAvatar } from "../ui/user-avatar";
 import { useSession } from "../providers/session-provider";
 import { Button } from "../ui/button";
-import "./styles.css";
+import "./post-editor.css";
 
 export function PostEditor() {
   const { user } = useSession();
