@@ -8,9 +8,13 @@ import { UserAvatar } from "../ui/user-avatar";
 import { useSession } from "../providers/session-provider";
 import { Button } from "../ui/button";
 import "./post-editor.css";
+import { useSubmitPostMutation } from "./mutations";
+import { Loader2 } from "lucide-react";
 
 export function PostEditor() {
   const { user } = useSession();
+
+  const mutation = useSubmitPostMutation();
 
   const editor = useEditor({
     extensions: [
@@ -29,9 +33,12 @@ export function PostEditor() {
       blockSeparator: "\n",
     }) || "";
 
-  async function onSubmit() {
-    await submitPostAction(input);
-    editor?.commands.clearContent();
+  function onSubmit() {
+    mutation.mutate(input, {
+      onSuccess: () => {
+        editor?.commands.clearContent();
+      },
+    });
   }
 
   return (
@@ -49,7 +56,7 @@ export function PostEditor() {
           disabled={!input.trim()}
           className="min-w-20"
         >
-          Post
+          {mutation.isPending ? <Loader2 className="animate-spin" /> : "Post"}
         </Button>
       </div>
     </div>
