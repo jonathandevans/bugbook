@@ -3,7 +3,6 @@
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
-import { submitPostAction } from "./actions";
 import { UserAvatar } from "../ui/user-avatar";
 import { useSession } from "../providers/session-provider";
 import { Button } from "../ui/button";

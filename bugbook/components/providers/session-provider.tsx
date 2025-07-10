@@ -1,7 +1,7 @@
 "use client";
 
 import { Session, User } from "lucia";
-import { createContext, PropsWithChildren, ReactNode, useContext } from "react";
+import { createContext, PropsWithChildren, useContext } from "react";
 
 interface SessionContext {
   user: User;

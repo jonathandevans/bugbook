@@ -6,7 +6,7 @@ import {
 } from "@tanstack/react-query";
 import { deletePostAction, submitPostAction } from "./actions";
 import { toast } from "sonner";
-import { PostData, PostsPage } from "@/lib/types";
+import { PostsPage } from "@/lib/types";
 import { usePathname, useRouter } from "next/navigation";
 
 export function useSubmitPostMutation() {

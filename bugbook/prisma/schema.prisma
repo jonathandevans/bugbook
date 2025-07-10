@@ -17,6 +17,9 @@ model User {
   bio         String?
   posts       Post[]
 
+  following Follow[] @relation("Following")
+  followers Follow[] @relation("Followers")
+
   sessions     Session[]
   email        String?   @unique
   passwordHash String?
@@ -36,6 +39,16 @@ model Session {
   userId String
 
   @@map("sessions")
+}
+
+model Follow {
+  follower    User   @relation("Following", fields: [followerId], references: [id], onDelete: Cascade)
+  followerId  String
+  following   User   @relation("Followers", fields: [followingId], references: [id], onDelete: Cascade)
+  followingId String
+
+  @@unique([followerId, followingId])
+  @@map("follows")
 }
 
 model Post {

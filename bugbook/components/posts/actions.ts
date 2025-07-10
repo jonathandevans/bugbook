@@ -2,7 +2,7 @@
 
 import { validateRequest } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { postDataInclude } from "@/lib/types";
+import { getPostDataInclude } from "@/lib/types";
 import { createPostSchema } from "@/lib/validation";
 
 export async function submitPostAction(input: string) {
@@ -16,7 +16,7 @@ export async function submitPostAction(input: string) {
       content,
       userId: user.id,
     },
-    include: postDataInclude,
+    include: getPostDataInclude(user.id),
   });
 
   return newPost;
@@ -36,7 +36,7 @@ export async function deletePostAction(id: string) {
 
   const deletedPost = await db.post.delete({
     where: { id },
-    include: postDataInclude,
+    include: getPostDataInclude(user.id),
   });
 
   return deletedPost;
