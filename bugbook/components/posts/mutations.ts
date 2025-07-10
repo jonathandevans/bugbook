@@ -8,16 +8,26 @@ import { deletePostAction, submitPostAction } from "./actions";
 import { toast } from "sonner";
 import { PostsPage } from "@/lib/types";
 import { usePathname, useRouter } from "next/navigation";
+import { useSession } from "../providers/session-provider";
 
 export function useSubmitPostMutation() {
   const queryClient = useQueryClient();
 
+  const { user } = useSession();
+
   const mutation = useMutation({
     mutationFn: submitPostAction,
     onSuccess: async (newPost) => {
-      const queryFilter: QueryFilters = {
-        queryKey: ["post-feed", "for-you"],
-      };
+      const queryFilter = {
+        queryKey: ["post-feed"],
+        predicate(query) {
+          return (
+            query.queryKey.includes("for-you") ||
+            (query.queryKey.includes("user-posts") &&
+              query.queryKey.includes(user.id))
+          );
+        },
+      } satisfies QueryFilters;
       await queryClient.cancelQueries(queryFilter);
 
       queryClient.setQueriesData<InfiniteData<PostsPage, string | null>>(
@@ -42,7 +52,7 @@ export function useSubmitPostMutation() {
       queryClient.invalidateQueries({
         queryKey: queryFilter.queryKey,
         predicate(query) {
-          return !query.state.data;
+          return queryFilter.predicate(query) && !query.state.data;
         },
       });
 
