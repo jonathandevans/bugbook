@@ -1,6 +1,8 @@
+import EditProfileButton from "@/components/edit-profile-button";
 import { UserPosts } from "@/components/feeds/user-posts";
 import { FollowButton } from "@/components/follow-button";
 import { FollowerCount } from "@/components/follower-count";
+import { Linkify } from "@/components/linkify";
 import { TrendsSidebar } from "@/components/trends-sidebar";
 import { Button } from "@/components/ui/button";
 import { UserAvatar } from "@/components/ui/user-avatar";
@@ -115,7 +117,7 @@ async function UserProfile({ user, loggedInUserId }: UserProfileProps) {
         </div>
 
         {user.id === loggedInUserId ? (
-          <Button variant="secondary">Edit profile</Button>
+          <EditProfileButton user={user} />
         ) : (
           <FollowButton userId={user.id} initialState={followerInfo} />
         )}
@@ -124,9 +126,11 @@ async function UserProfile({ user, loggedInUserId }: UserProfileProps) {
       {user.bio && (
         <>
           <hr />
-          <div className="whitespace-pre-line overflow-hidden break-words">
-            {user.bio}
-          </div>
+          <Linkify>
+            <div className="whitespace-pre-line overflow-hidden break-words">
+              {user.bio}
+            </div>
+          </Linkify>
         </>
       )}
     </div>

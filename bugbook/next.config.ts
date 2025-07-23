@@ -6,5 +6,13 @@ const nextConfig: NextConfig = {
       dynamic: 30,
     },
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "*ufs.sh",
+      }
+    ]
+  }
 };
 export default nextConfig;
