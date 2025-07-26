@@ -9,6 +9,11 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+enum MediaType {
+  image
+  video
+}
+
 model User {
   id          String  @id
   username    String  @unique
@@ -16,6 +21,10 @@ model User {
   avatarUrl   String?
   bio         String?
   posts       Post[]
+
+  likes     Like[]
+  bookmarks Bookmark[]
+  comments  Comment[]
 
   following Follow[] @relation("Following")
   followers Follow[] @relation("Followers")
@@ -52,8 +61,13 @@ model Follow {
 }
 
 model Post {
-  id      String @id @default(cuid())
-  content String
+  id          String  @id @default(cuid())
+  content     String
+  attachments Media[]
+
+  likes     Like[]
+  bookmarks Bookmark[]
+  comments  Comment[]
 
   createdAt DateTime @default(now())
 
@@ -61,4 +75,54 @@ model Post {
   userId String
 
   @@map("posts")
+}
+
+model Media {
+  id   String    @id @default(cuid())
+  type MediaType
+  url  String
+
+  createdAt DateTime @default(now())
+
+  post   Post?   @relation(fields: [postId], references: [id], onDelete: SetNull)
+  postId String?
+
+  @@map("post_media")
+}
+
+model Like {
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId String
+
+  @@unique([userId, postId])
+  @@map("likes")
+}
+
+model Bookmark {
+  id     String @id @default(cuid())
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId String
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, postId])
+  @@map("bookmarks")
+}
+
+model Comment {
+  id      String @id @default(cuid())
+  content String
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId String
+
+  createdAt DateTime @default(now())
+
+  @@map("comments")
 }

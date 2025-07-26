@@ -4,9 +4,11 @@ import { getUserDataSelect } from "@/lib/types";
 
 export async function GET(
   req: Request,
-  { params: { username } }: { params: { username: string } }
+  { params }: { params: Promise<{ username: string }> }
 ) {
   try {
+    const { username } = await params;
+
     const { user: loggedInUser } = await validateRequest();
     if (!loggedInUser)
       return Response.json({ error: "Unauthorised" }, { status: 401 });
