@@ -17,14 +17,28 @@ export async function submitCommentAction({
 
   const { content: contentValidated } = createCommentSchema.parse({ content });
 
-  const newComment = await db.comment.create({
-    data: {
-      content: contentValidated,
-      postId: post.id,
-      userId: user.id,
-    },
-    include: getCommentDataInclude(user.id),
-  });
+  const [newComment] = await db.$transaction([
+    db.comment.create({
+      data: {
+        content: contentValidated,
+        postId: post.id,
+        userId: user.id,
+      },
+      include: getCommentDataInclude(user.id),
+    }),
+    ...(post.user.id !== user.id
+      ? [
+          db.notification.create({
+            data: {
+              issuerId: user.id,
+              recipientId: post.user.id,
+              postId: post.id,
+              type: "comment",
+            },
+          }),
+        ]
+      : []),
+  ]);
 
   return newComment;
 }
@@ -36,7 +50,6 @@ export async function deleteCommentAction(id: string) {
   const comment = await db.comment.findUnique({
     where: { id },
   });
-
   if (!comment) throw new Error("Comment not found");
   if (comment.userId !== user.id) throw new Error("Unauthorised");
 

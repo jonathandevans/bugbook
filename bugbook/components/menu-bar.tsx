@@ -1,12 +1,25 @@
 import Link from "next/link";
 import { Button } from "./ui/button";
 import { Bell, Bookmark, Home, Send } from "lucide-react";
+import { NotificationsButton } from "./notifications-button";
+import { validateRequest } from "@/lib/auth";
+import { db } from "@/lib/db";
 
 interface MenuBarProps {
   className?: string;
 }
 
-export function MenuBar({ className }: MenuBarProps) {
+export async function MenuBar({ className }: MenuBarProps) {
+  const { user } = await validateRequest();
+  if (!user) return null;
+
+  const unreadCount = await db.notification.count({
+    where: {
+      recipientId: user.id,
+      read: false,
+    },
+  });
+
   return (
     <div className={className}>
       <Button
@@ -21,17 +34,7 @@ export function MenuBar({ className }: MenuBarProps) {
         </Link>
       </Button>
 
-      <Button
-        variant="ghost"
-        className="flex items-center justify-start gap-3"
-        title="Notifications"
-        asChild
-      >
-        <Link href="/notifications">
-          <Bell className="size-4" />
-          <span className="hidden lg:inline">Notifications</span>
-        </Link>
-      </Button>
+      <NotificationsButton initialState={{ unreadCount }} />
 
       <Button
         variant="ghost"

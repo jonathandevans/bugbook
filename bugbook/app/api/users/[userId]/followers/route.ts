@@ -54,19 +54,28 @@ export async function POST(
     if (!loggedInUser)
       return Response.json({ error: "Unauthorised" }, { status: 401 });
 
-    await db.follow.upsert({
-      where: {
-        followerId_followingId: {
+    await db.$transaction([
+      db.follow.upsert({
+        where: {
+          followerId_followingId: {
+            followerId: loggedInUser.id,
+            followingId: userId,
+          },
+        },
+        create: {
           followerId: loggedInUser.id,
           followingId: userId,
         },
-      },
-      create: {
-        followerId: loggedInUser.id,
-        followingId: userId,
-      },
-      update: {},
-    });
+        update: {},
+      }),
+      db.notification.create({
+        data: {
+          issuerId: loggedInUser.id,
+          recipientId: userId,
+          type: "follow",
+        },
+      }),
+    ]);
 
     return new Response();
   } catch (error) {
@@ -84,12 +93,21 @@ export async function DELETE(
     if (!loggedInUser)
       return Response.json({ error: "Unauthorised" }, { status: 401 });
 
-    await db.follow.deleteMany({
-      where: {
-        followerId: loggedInUser.id,
-        followingId: userId,
-      },
-    });
+    await db.$transaction([
+      db.follow.deleteMany({
+        where: {
+          followerId: loggedInUser.id,
+          followingId: userId,
+        },
+      }),
+      db.notification.deleteMany({
+        where: {
+          issuerId: loggedInUser.id,
+          recipientId: userId,
+          type: "follow",
+        },
+      }),
+    ]);
 
     return new Response();
   } catch (error) {
